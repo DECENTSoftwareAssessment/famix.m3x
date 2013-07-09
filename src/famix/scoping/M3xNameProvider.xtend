@@ -21,6 +21,12 @@ class M3xNameProvider extends SimpleNameProvider {
             return QualifiedName::create((obj as FAMIX.Package).getId().toString());
         if (obj instanceof FAMIX.Class)
             return QualifiedName::create((obj as FAMIX.Class).getId().toString());
+        if (obj instanceof FAMIX.ParameterizableClass)
+            return QualifiedName::create((obj as FAMIX.ParameterizableClass).getId().toString());
+        if (obj instanceof FAMIX.ParameterizedType)
+            return QualifiedName::create((obj as FAMIX.ParameterizedType).getId().toString());
+        if (obj instanceof FAMIX.ParameterType)
+            return QualifiedName::create((obj as FAMIX.ParameterType).getId().toString());
         if (obj instanceof FAMIX.FileAnchor)
             return QualifiedName::create((obj as FAMIX.FileAnchor).getId().toString());
         if (obj instanceof FAMIX.Method)
@@ -37,6 +43,14 @@ class M3xNameProvider extends SimpleNameProvider {
             return QualifiedName::create((obj as FAMIX.Method).getId().toString());
         if (obj instanceof FAMIX.PrimitiveType)
             return QualifiedName::create((obj as FAMIX.PrimitiveType).getId().toString());
+        if (obj instanceof FAMIX.Namespace)
+            return QualifiedName::create((obj as FAMIX.Namespace).getId().toString());
+        if (obj instanceof FAMIX.Enum)
+            return QualifiedName::create((obj as FAMIX.Enum).getId().toString());
+        if (obj instanceof FAMIX.AbstractDeclaredType)
+            return QualifiedName::create((obj as FAMIX.AbstractDeclaredType).getId().toString());
+//        if (obj instanceof AbstractDECENTProvider.AbstractNamedElement)
+//            return QualifiedName::create((obj as AbstractDECENTProvider.AbstractNamedElement).getId().toString());
         super.getFullyQualifiedName(obj)
     }
     

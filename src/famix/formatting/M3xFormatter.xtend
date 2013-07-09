@@ -27,10 +27,29 @@ public class M3xFormatter extends AbstractDeclarativeFormatter {
 			c.setLinewrap(1).before(pair.second)
 			c.setLinewrap(1).after(pair.second)
 		}
-		for(comma: findKeywords(',')) {
+        for(pair: findKeywordPairs('(', ')')) {
+            c.setIndentation(pair.first, pair.second)
+            c.setNoLinewrap().after(pair.first)
+            c.setNoSpace().after(pair.first);
+            c.setNoSpace().before(pair.second);
+            c.setNoLinewrap().before(pair.second)
+            c.setLinewrap(1).after(pair.second)
+        }
+        for(pair: findKeywordPairs(')', ')')) {
+            c.setNoLinewrap().after(pair.first)
+            c.setLinewrap(1).before(pair.second)
+            c.setLinewrap(1).after(pair.second)
+            c.setIndentationDecrement.after(pair.second)
+        }
+        for(pair: findKeywordPairs('(', '(')) {
+            c.setLinewrap(1).after(pair.first)
+            c.setIndentationIncrement.before(pair.second)
+            c.setNoLinewrap().after(pair.second)
+        }
+		for(comma: findKeywords(',','id:','ref:')) {
 			c.setNoLinewrap().before(comma)
 			c.setNoSpace().before(comma)
-			c.setLinewrap().after(comma)
+			c.setNoLinewrap().after(comma)
 		}
 		c.setLinewrap(0, 1, 2).before(SL_COMMENTRule)
 		c.setLinewrap(0, 1, 2).before(ML_COMMENTRule)

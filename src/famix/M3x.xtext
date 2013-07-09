@@ -13,7 +13,34 @@ Model returns Model:
 ;
 
 AbstractElement:
-    Class|Package|FileAnchor|TypeAlias|Module|Parameter|LocalVariable|Method|PrimitiveType//|Module|Method
+    Class
+    | ParameterizableClass
+    | Package
+    | FileAnchor
+    | TypeAlias
+    | Module
+    | Parameter
+    | LocalVariable
+    | Method
+    | PrimitiveType
+    | GlobalVariable
+    | Attribute
+    | Invocation
+    | Inheritance
+    | Namespace
+    | LanguageSpec
+    | Access
+    | Function
+    | ParameterType
+    | ParameterizedType
+    | Enum
+    | EnumValue;
+
+LanguageSpec returns FAMIX::CSourceLanguage:
+    {FAMIX::CSourceLanguage}
+    '('
+    'FAMIX.CSourceLanguage'
+    ')'
 ;
 
 EID returns ecore::EString:
@@ -27,10 +54,29 @@ Package returns FAMIX::Package:
 	'FAMIX.Package'
 	'(' 'id:' id=EInt ')' 
 	('(' 'name' name=EString ')')?
-    ('Module_OF_parentPackage' '(' Module_OF_parentPackage+=[FAMIX::Module|EString] ( "," Module_OF_parentPackage+=[FAMIX::Module|EString])* ')' )?
-    ('TypeAlias_OF_parentPackage' '(' TypeAlias_OF_parentPackage+=[FAMIX::TypeAlias|EString] ( "," TypeAlias_OF_parentPackage+=[FAMIX::TypeAlias|EString])* ')' )?
-    ('Class_OF_parentPackage' '(' Class_OF_parentPackage+=[FAMIX::Class|EID] ( "," Class_OF_parentPackage+=[FAMIX::Class|EID])* ')' )?
+
+    	//derived
+        ('Module_OF_parentPackage' '(' Module_OF_parentPackage+=[FAMIX::Module|EID] ( "," Module_OF_parentPackage+=[FAMIX::Module|EID])* ')' )?
+        ('TypeAlias_OF_parentPackage' '(' TypeAlias_OF_parentPackage+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_parentPackage+=[FAMIX::TypeAlias|EID])* ')' )?
+        ('Class_OF_parentPackage' '(' Class_OF_parentPackage+=[FAMIX::Class|EID] ( "," Class_OF_parentPackage+=[FAMIX::Class|EID])* ')' )?
 	')';
+
+Namespace returns FAMIX::Namespace:
+    {FAMIX::Namespace}
+    '('
+    'FAMIX.Namespace'
+    '(' 'id:' id=EInt ')' 
+    ('(' 'parentScope' '(' 'ref:' parentScope_IN_Namespace+=[FAMIX::Namespace|EID] ')' ')')?
+    ('(' 'name' name=EString ')')?
+
+        //derived
+        ('Function_OF_parentScope' '(' Function_OF_parentScope+=[FAMIX::Function|EID] ("," Function_OF_parentScope+=[FAMIX::Function|EID])* ')' )?
+        ('Namespace_OF_parentScope' '(' Namespace_OF_parentScope+=[FAMIX::Namespace|EID] ("," Namespace_OF_parentScope+=[FAMIX::Namespace|EID])* ')' )?
+        ('GlobalVariable_OF_container' GlobalVariable_OF_container+=[FAMIX::GlobalVariable|EID] ("," GlobalVariable_OF_container+=[FAMIX::GlobalVariable|EID])* ')' )?
+        ('Class_OF_container' '(' Class_OF_container+=[FAMIX::Class|EID] (',' Class_OF_container+=[FAMIX::Class|EID])* ')' )?
+        ('Enum_OF_container' '(' Enum_OF_container+=[FAMIX::Enum|EID] (',' Enum_OF_container+=[FAMIX::Enum|EID])* ')' )?
+    ')';
+
 
 EBigInteger returns ecore::EBigInteger:
 	'-'? INT;
@@ -47,6 +93,7 @@ TypeAlias returns FAMIX::TypeAlias:
 	'('
     'FAMIX.TypeAlias'
     '(' 'id:' id=EInt ')' 
+//    ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
     ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
     ('(' 'parentPackage' '(' 'ref:' parentPackage_IN_Package+=[FAMIX::Package|EID] ( "," parentPackage_IN_Package+=[FAMIX::Package|EID])* ')' ')')?
     ('(' 'name' name=EString ')')?
@@ -76,65 +123,117 @@ TypeAlias returns FAMIX::TypeAlias:
 	('(' 'TCC' TCC=EDouble ')')?
 	('(' 'WOC' WOC=EDouble ')')?
     ('(' 'aliasedType' '(' 'ref:' aliasedType_IN_Class+=[FAMIX::Class|EID] ( "," aliasedType_IN_Class+=[FAMIX::Class|EID])* ')' ')')?
-		('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EString] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EString])* ')' )?
-		('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EString] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EString])* ')' )?
-		('Method_OF_declaredType' '(' Method_OF_declaredType+=[FAMIX::Method|EString] ( "," Method_OF_declaredType+=[FAMIX::Method|EString])* ')' )?
-		('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EString] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EString])* ')' )?
+
+        //derived
+		('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EID] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EID])* ')' )?
+		('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID])* ')' )?
+		('Method_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Method|EID]  ')' )?
+		('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EID])* ')' )?
 	')';
 
 Class returns FAMIX::Class:
 	{FAMIX::Class}
 	'('
     'FAMIX.Class'
-    '('
-    'id:'
-    id=EInt
-    ')'
-        ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
-	    ('(' 'isStub' isStub=EBoolean')')?
-        ('(' 'parentPackage' '(' 'ref:' parentPackage_IN_Package+=[FAMIX::Package|EID] ( "," parentPackage_IN_Package+=[FAMIX::Package|EID])* ')' ')')?
-        ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ( "," container_IN_Namespace+=[FAMIX::Namespace|EID])* ')' ')')?
-        ('(' 'name' name=EString ')')?
-        ('(' 'isAbstract' isAbstract=EBoolean ')')?
-		('(' 'AMW' AMW=EDouble ')')?
-		('(' 'BOvR' BOvR=EDouble ')')?
-		('(' 'BUR' BUR=EDouble ')')?
-		('(' 'CPFD' CPFD=EDouble ')')?
-		('(' 'CW' CW=EDouble ')')?
-		('(' 'CBO' CBO=EDouble ')')?
-		('(' 'DIT' DIT=EDouble ')')?
-		('(' 'LCOM' LCOM=EDouble ')')?
-		('(' 'LCC' LCC=EDouble ')')?
-		('(' 'NOAM' NOAM=EDouble ')')?
-		('(' 'NOACCM' NOACCM=EDouble ')')?
-		('(' 'NAS' NAS=EDouble ')')?
-		('(' 'NOA' NOA=EDouble ')')?
-		('(' 'NOCHLD' NOCHLD=EDouble ')')?
-		('(' 'NOM' NOM=EDouble ')')?
-		('(' 'NOVRM' NOVRM=EDouble ')')?
-		('(' 'NOPRTA' NOPRTA=EDouble ')')?
-		('(' 'NOPRTM' NOPRTM=EDouble ')')?
-		('(' 'NOPUBA' NOPUBA=EDouble ')')?
-		('(' 'NOPUBM' NOPUBM=EDouble ')')?
-		('(' 'PNAS' PNAS=EDouble ')')?
-		('(' 'RFC' RFC=EDouble ')')?
-		('(' 'SPIDX' SPIDX=EDouble ')')?
-		('(' 'TCC' TCC=EDouble ')')?
-		('(' 'WOC' WOC=EDouble ')')?
-		('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EString] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EString])* ')' )?
-		('TypeAlias_OF_aliasedType' '(' TypeAlias_OF_aliasedType+=[FAMIX::TypeAlias|EString] ( "," TypeAlias_OF_aliasedType+=[FAMIX::TypeAlias|EString])* ')' )?
-		('Method_OF_parentType' '(' Method_OF_parentType+=[FAMIX::Method|EString] ( "," Method_OF_parentType+=[FAMIX::Method|EString])* ')' )?
-		('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EString] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EString])* ')' )?
-		('Attribute_OF_parentType' '(' Attribute_OF_parentType+=[FAMIX::Attribute|EString] ( "," Attribute_OF_parentType+=[FAMIX::Attribute|EString])* ')' )?
-		('Function_OF_declaredType' '(' Function_OF_declaredType+=[FAMIX::Function|EString] ( "," Function_OF_declaredType+=[FAMIX::Function|EString])* ')' )?
-		('Method_OF_declaredType' '(' Method_OF_declaredType+=[FAMIX::Method|EString] ( "," Method_OF_declaredType+=[FAMIX::Method|EString])* ')' )?
-		('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EString] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EString])* ')' )?
-		('Inheritance_OF_subclass' '(' Inheritance_OF_subclass+=[FAMIX::Inheritance|EString] ( "," Inheritance_OF_subclass+=[FAMIX::Inheritance|EString])* ')' )?
-		('Inheritance_OF_superclass' '(' Inheritance_OF_superclass+=[FAMIX::Inheritance|EString] ( "," Inheritance_OF_superclass+=[FAMIX::Inheritance|EString])* ')' )?
-		('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EString] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EString])* ')' )?
+    '(' 'id:' id=EInt ')'
+    ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
+    ('(' 'isStub' isStub=EBoolean')')?
+    ('(' 'parentPackage' '(' 'ref:' parentPackage_IN_Package+=[FAMIX::Package|EID] ( "," parentPackage_IN_Package+=[FAMIX::Package|EID])* ')' ')')?
+    ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ( "," container_IN_Namespace+=[FAMIX::Namespace|EID])* ')' ')')?
+    ('(' 'name' name=EString ')')?
+    ('(' 'isAbstract' isAbstract=EBoolean ')')?
+	('(' 'AMW' AMW=EDouble ')')?
+	('(' 'BOvR' BOvR=EDouble ')')?
+	('(' 'BUR' BUR=EDouble ')')?
+	('(' 'CPFD' CPFD=EDouble ')')?
+	('(' 'CW' CW=EDouble ')')?
+	('(' 'CBO' CBO=EDouble ')')?
+	('(' 'DIT' DIT=EDouble ')')?
+	('(' 'LCOM' LCOM=EDouble ')')?
+	('(' 'LCC' LCC=EDouble ')')?
+	('(' 'NOAM' NOAM=EDouble ')')?
+	('(' 'NOACCM' NOACCM=EDouble ')')?
+	('(' 'NAS' NAS=EDouble ')')?
+	('(' 'NOA' NOA=EDouble ')')?
+	('(' 'NOCHLD' NOCHLD=EDouble ')')?
+	('(' 'NOM' NOM=EDouble ')')?
+	('(' 'NOVRM' NOVRM=EDouble ')')?
+	('(' 'NOPRTA' NOPRTA=EDouble ')')?
+	('(' 'NOPRTM' NOPRTM=EDouble ')')?
+	('(' 'NOPUBA' NOPUBA=EDouble ')')?
+	('(' 'NOPUBM' NOPUBM=EDouble ')')?
+	('(' 'PNAS' PNAS=EDouble ')')?
+	('(' 'RFC' RFC=EDouble ')')?
+	('(' 'SPIDX' SPIDX=EDouble ')')?
+	('(' 'TCC' TCC=EDouble ')')?
+	('(' 'WOC' WOC=EDouble ')')?
+
+	    //derived
+        ('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EID] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EID])* ')' )?
+        ('TypeAlias_OF_aliasedType' '(' TypeAlias_OF_aliasedType+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_aliasedType+=[FAMIX::TypeAlias|EID])* ')' )?
+        ('Method_OF_parentType' '(' Method_OF_parentType+=[FAMIX::Method|EID] ( "," Method_OF_parentType+=[FAMIX::Method|EID])* ')' )?
+        ('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID])* ')' )?
+        ('Attribute_OF_parentType' '(' Attribute_OF_parentType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_parentType+=[FAMIX::Attribute|EID])* ')' )?
+        ('Function_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Function|EID] ')' )?
+        ('Method_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Method|EID]  ')' )?
+        ('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EID])* ')' )?
+        ('Inheritance_OF_subclass' '(' Inheritance_OF_subclass+=[FAMIX::Inheritance|EID] ( "," Inheritance_OF_subclass+=[FAMIX::Inheritance|EID])* ')' )?
+        ('Inheritance_OF_superclass' '(' Inheritance_OF_superclass+=[FAMIX::Inheritance|EID] ( "," Inheritance_OF_superclass+=[FAMIX::Inheritance|EID])* ')' )?
+        ('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID])* ')' )?
     ')'
 	;
 
+ParameterizableClass returns FAMIX::ParameterizableClass:
+    {FAMIX::ParameterizableClass}
+    '('
+    'FAMIX.ParameterizableClass'
+    '(' 'id:' id=EInt ')'
+    ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
+    ('(' 'isStub' isStub=EBoolean')')?
+    ('(' 'parentPackage' '(' 'ref:' parentPackage_IN_Package+=[FAMIX::Package|EID] ( "," parentPackage_IN_Package+=[FAMIX::Package|EID])* ')' ')')?
+    ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ( "," container_IN_Namespace+=[FAMIX::Namespace|EID])* ')' ')')?
+    ('(' 'name' name=EString ')')?
+    ('(' 'isAbstract' isAbstract=EBoolean ')')?
+    ('(' 'AMW' AMW=EDouble ')')?
+    ('(' 'BOvR' BOvR=EDouble ')')?
+    ('(' 'BUR' BUR=EDouble ')')?
+    ('(' 'CPFD' CPFD=EDouble ')')?
+    ('(' 'CW' CW=EDouble ')')?
+    ('(' 'CBO' CBO=EDouble ')')?
+    ('(' 'DIT' DIT=EDouble ')')?
+    ('(' 'LCOM' LCOM=EDouble ')')?
+    ('(' 'LCC' LCC=EDouble ')')?
+    ('(' 'NOAM' NOAM=EDouble ')')?
+    ('(' 'NOACCM' NOACCM=EDouble ')')?
+    ('(' 'NAS' NAS=EDouble ')')?
+    ('(' 'NOA' NOA=EDouble ')')?
+    ('(' 'NOCHLD' NOCHLD=EDouble ')')?
+    ('(' 'NOM' NOM=EDouble ')')?
+    ('(' 'NOVRM' NOVRM=EDouble ')')?
+    ('(' 'NOPRTA' NOPRTA=EDouble ')')?
+    ('(' 'NOPRTM' NOPRTM=EDouble ')')?
+    ('(' 'NOPUBA' NOPUBA=EDouble ')')?
+    ('(' 'NOPUBM' NOPUBM=EDouble ')')?
+    ('(' 'PNAS' PNAS=EDouble ')')?
+    ('(' 'RFC' RFC=EDouble ')')?
+    ('(' 'SPIDX' SPIDX=EDouble ')')?
+    ('(' 'TCC' TCC=EDouble ')')?
+    ('(' 'WOC' WOC=EDouble ')')?
+
+        //derived
+        ('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EID] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EID])* ')' )?
+        ('TypeAlias_OF_aliasedType' '(' TypeAlias_OF_aliasedType+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_aliasedType+=[FAMIX::TypeAlias|EID])* ')' )?
+        ('Method_OF_parentType' '(' Method_OF_parentType+=[FAMIX::Method|EID] ( "," Method_OF_parentType+=[FAMIX::Method|EID])* ')' )?
+        ('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID])* ')' )?
+        ('Attribute_OF_parentType' '(' Attribute_OF_parentType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_parentType+=[FAMIX::Attribute|EID])* ')' )?
+        ('Function_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Function|EID] ')' )?
+        ('Method_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Method|EID]  ')' )?
+        ('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EID])* ')' )?
+        ('Inheritance_OF_subclass' '(' Inheritance_OF_subclass+=[FAMIX::Inheritance|EID] ( "," Inheritance_OF_subclass+=[FAMIX::Inheritance|EID])* ')' )?
+        ('Inheritance_OF_superclass' '(' Inheritance_OF_superclass+=[FAMIX::Inheritance|EID] ( "," Inheritance_OF_superclass+=[FAMIX::Inheritance|EID])* ')' )?
+        ('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID])* ')' )?
+    ')'
+    ;
 
 Module returns FAMIX::Module:
 	{FAMIX::Module}
@@ -149,8 +248,10 @@ Module returns FAMIX::Module:
 	('(' 'NOGV' NOGV=EDouble ')')?
 	('(' 'TCC' TCC=EDouble ')')?
 	('(' 'WOC' WOC=EDouble ')')?
-		('Function_OF_parentModule' '(' Function_OF_parentModule+=[FAMIX::Function|EString] ( "," Function_OF_parentModule+=[FAMIX::Function|EString])* ')' )?
-		('GlobalVariable_OF_parentModule' '(' GlobalVariable_OF_parentModule+=[FAMIX::GlobalVariable|EString] ( "," GlobalVariable_OF_parentModule+=[FAMIX::GlobalVariable|EString])* ')' )?
+
+	   //derived
+		('Function_OF_parentModule' '(' Function_OF_parentModule+=[FAMIX::Function|EID] ( "," Function_OF_parentModule+=[FAMIX::Function|EID])* ')' )?
+		('GlobalVariable_OF_parentModule' '(' GlobalVariable_OF_parentModule+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_parentModule+=[FAMIX::GlobalVariable|EID])* ')' )?
 	')';
 
 EDouble returns ecore::EDouble:
@@ -167,200 +268,199 @@ FileAnchor returns FAMIX::FileAnchor:
 	('(' 'startColumn' startColumn=EInt ')')?
 	('(' 'endColumn' endColumn=EInt ')')?
 
-	('Function_OF_sourceAnchor' '(' Function_OF_sourceAnchor+=[FAMIX::Function|EID] ( "," Function_OF_sourceAnchor+=[FAMIX::Function|EID])* ')' )?
-	('TypeAlias_OF_sourceAnchor' '(' TypeAlias_OF_sourceAnchor+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_sourceAnchor+=[FAMIX::TypeAlias|EID])* ')' )?
-	('Class_OF_sourceAnchor' '(' Class_OF_sourceAnchor+=[FAMIX::Class|EID] ( "," Class_OF_sourceAnchor+=[FAMIX::Class|EID])* ')' )?
-	('Method_OF_sourceAnchor' '(' Method_OF_sourceAnchor+=[FAMIX::Method|EID] ( "," Method_OF_sourceAnchor+=[FAMIX::Method|EID])* ')' )?
+        //derived
+    	('Function_OF_sourceAnchor' '(' BehaviouralEntity_OF_sourceAnchor+=[FAMIX::Function|EID]  ')' )?
+    	('TypeAlias_OF_sourceAnchor' '(' TypeAlias_OF_sourceAnchor+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_sourceAnchor+=[FAMIX::TypeAlias|EID])* ')' )?
+    	('Class_OF_sourceAnchor' '(' Class_OF_sourceAnchor+=[FAMIX::Class|EID] ( "," Class_OF_sourceAnchor+=[FAMIX::Class|EID])* ')' )?
+    	('Method_OF_sourceAnchor' '(' BehaviouralEntity_OF_sourceAnchor+=[FAMIX::Method|EID]  ')' )?
 	')';
 
-//Ignore warnings
 Parameter returns FAMIX::Parameter:
 	{FAMIX::Parameter}
 	'('
     'FAMIX.Parameter'
     '(' 'id:' id=EInt ')'
-		('(' 'name' name=EString ')')?
-		('(' 'position' position=EInt ')')?
-		('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity_IN_Function+=[FAMIX::Function|EID] ( "," parentBehaviouralEntity_IN_Function+=[FAMIX::Function|EID])* ')' ')')?
-		('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity_IN_Method+=[FAMIX::Method|EID] ( "," parentBehaviouralEntity_IN_Method+=[FAMIX::Method|EID])* ')' ')')?
+	('(' 'name' name=EString ')')?
+	('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity+=[FAMIX::AbstractBehaviouralEntity|EID] ')' ')')?
+	('(' 'declaredType' '(' 'ref:' ( declaredType+=[FAMIX::AbstractDeclaredType|EID] ) ')' ')')?
+	('(' 'position' position=EInt ')')?
 
-//        ('(' 'declaredType' '(' 'ref:' declaredType_IN_Class+=[FAMIX::Class|EID] ( "," declaredType_IN_Class+=[FAMIX::Class|EID])* ')' ')')?
-//        ('(' 'declaredType' '(' 'ref:' declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID] ( "," declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID])* ')' ')')?
-//        ('(' 'declaredType' '(' 'ref:' declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID] ( "," declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID])* ')' ')')?
-
-		
-		('(' 'declaredType' 
-		    '(' 'ref:' 
-		    ( declaredType_IN_Class+=[FAMIX::Class|EID]
-		      |
-		      declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID]
-		      |
-		      declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID]
-		    )
-	        ')' ')'
-		)?
-
-		('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EString] ( "," Access_OF_receiver+=[FAMIX::Access|EString])* ')' )?
-		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EString] ( "," Access_OF_variable+=[FAMIX::Access|EString])* ')' )?
-		('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EString] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EString])* ')' )?
+		//derived
+		('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EID] ( "," Access_OF_receiver+=[FAMIX::Access|EID])* ')' )?
+		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
+		('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EID] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EID])* ')' )?
 	')';
 
-//Ignore warnings
+ParameterType returns FAMIX::ParameterType:
+    {FAMIX::ParameterType}
+    '('
+    'FAMIX.ParameterType'
+    '(' 'id:' id=EInt ')'
+    ('(' 'name' name=EString ')')?
+    ('(' 'container' '(' 'ref:' ( container_IN_Namespace+=[FAMIX::Namespace|EID] ) ')' ')')?
+
+        //derived
+    ')';
+
+ParameterizedType returns FAMIX::ParameterizedType:
+    {FAMIX::ParameterizedType}
+    '('
+    'FAMIX.ParameterizedType'
+    '(' 'id:' id=EInt ')'
+    ('(' 'name' name=EString ')')?
+    ('(' 'parameterizableClass' '(' 'ref:' ( parameterizableClass+=[FAMIX::ParameterizableClass|EID] ) ')' ')')?
+    ('(' 'arguments' '(' 'ref:' ( arguments+=[FAMIX::AbstractDeclaredType|EID] ) ')' ')')?
+
+        //derived
+    ')';
+
+
 LocalVariable returns FAMIX::LocalVariable:
 	{FAMIX::LocalVariable}
 	'('
     'FAMIX.LocalVariable'
     '(' 'id:' id=EInt ')'
-        ('(' 'name' name=EString ')')?
-		('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity_IN_Function+=[FAMIX::Function|EID] ( "," parentBehaviouralEntity_IN_Function+=[FAMIX::Function|EID])* ')' ')')?
-		('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity_IN_Method+=[FAMIX::Method|EID] ( "," parentBehaviouralEntity_IN_Method+=[FAMIX::Method|EID])* ')' ')')?
-		('(' 'declaredType' '(' 'ref:' declaredType_IN_Class+=[FAMIX::Class|EID] ( "," declaredType_IN_Class+=[FAMIX::Class|EID])* ')' ')')?
-		('(' 'declaredType' '(' 'ref:' declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID] ( "," declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID])* ')' ')')?
-		('(' 'declaredType' '(' 'ref:' declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID] ( "," declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID])* ')' ')')?
-		('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EString] ( "," Access_OF_receiver+=[FAMIX::Access|EString])* ')' )?
-		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EString] ( "," Access_OF_variable+=[FAMIX::Access|EString])* ')' )?
-		('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EString] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EString])* ')' )?
+    ('(' 'name' name=EString ')')?
+	('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID] ')' ')')?
+	('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity+=[FAMIX::AbstractBehaviouralEntity|EID] ')' ')')?
+
+        //derived
+		('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EID] ( "," Access_OF_receiver+=[FAMIX::Access|EID])* ')' )?
+		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
+		('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EID] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EID])* ')' )?
 	')';
 
-//Ignore warnings
 Method returns FAMIX::Method:
 	{FAMIX::Method}
 	'('
     'FAMIX.Method'
     '(' 'id:' id=EInt ')'
 	    
-	    
-		('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
-		('(' 'parentType' '(' 'ref:' parentType_IN_Class+=[FAMIX::Class|EID] ( "," parentType_IN_Class+=[FAMIX::Class|EID])* ')' ')')?
-		('(' 'declaredType' '(' 'ref:' declaredType_IN_Class+=[FAMIX::Class|EID] ( "," declaredType_IN_Class+=[FAMIX::Class|EID])* ')' ')')?
-		('(' 'declaredType' '(' 'ref:' declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID] ( "," declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EID])* ')' ')')?
-		('(' 'declaredType' '(' 'ref:' declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID] ( "," declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EID])* ')' ')')?
-	    ('(' 'name' name=EString ')')?
-		('(' 'signature' signature=EString ')')?
-    	('(' 'isPublic' isPublic?=EBoolean ')')?
-    	('(' 'isProtected' isProtected?=EBoolean ')')?
-    	('(' 'isPrivate' isPrivate?=EBoolean ')')?
-    	('(' 'isConstructor' isConstructor?=EBoolean ')')?
-    	('(' 'isAbstract' isAbstract?=EBoolean ')')?
-    	('(' 'isVirtual' isVirtual?=EBoolean ')')?
-
-    	('(' 'hasClassScope' hasClassScope?=EBoolean ')')?
-    	('(' 'isPureAccessor' isPureAccessor?=EBoolean ')')?
-    	
-		('(' 'ATFD' ATFD=EDouble ')')?
-		('(' 'ALD' ALD=EDouble ')')?
-		('(' 'CYCLO' CYCLO=EDouble ')')?
-		('(' 'DR' DR=EDouble ')')?
-		('(' 'ICDO' ICDO=EDouble ')')?
-		('(' 'ICIO' ICIO=EDouble ')')?
-		('(' 'LOC' LOC=EDouble ')')?
-		('(' 'LOCOMM' LOCOMM=EDouble ')')?
-		('(' 'LDA' LDA=EDouble ')')?
-		('(' 'MAXNESTING' MAXNESTING=EDouble ')')?
-		('(' 'NOAV' NOAV=EDouble ')')?
-		('(' 'NOOC' NOOC=EDouble ')')?
-		('(' 'NOPAR' NOPAR=EDouble ')')?
-		('(' 'OCDO' OCDO=EDouble ')')?
-		('(' 'OCIO' OCIO=EDouble ')')?
+	('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
+	('(' 'parentType' '(' 'ref:' parentType_IN_Class+=[FAMIX::Class|EID] ( "," parentType_IN_Class+=[FAMIX::Class|EID])* ')' ')')?
+	('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID] ')' ')')?
+    ('(' 'name' name=EString ')')?
+	('(' 'signature' signature=EString ')')?
+	('(' 'hasClassScope' hasClassScope?=EBoolean ')')?
+	('(' 'isPublic' isPublic?=EBoolean ')')?
+	('(' 'isProtected' isProtected?=EBoolean ')')?
+	('(' 'isPrivate' isPrivate?=EBoolean ')')?
+	('(' 'isVirtual' isVirtual?=EBoolean ')')?
+	('(' 'isPureAccessor' isPureAccessor?=EBoolean ')')?
+	('(' 'isAbstract' isAbstract?=EBoolean ')')?
+	('(' 'isPackage' isPackage?=EBoolean ')')?
+	('(' 'isConstructor' isConstructor?=EBoolean ')')?
+	
+	('(' 'ATFD' ATFD=EDouble ')')?
+	('(' 'ALD' ALD=EDouble ')')?
+	('(' 'CYCLO' CYCLO=EDouble ')')?
+	('(' 'DR' DR=EDouble ')')?
+	('(' 'ICDO' ICDO=EDouble ')')?
+	('(' 'ICIO' ICIO=EDouble ')')?
+	('(' 'LOC' LOC=EDouble ')')?
+	('(' 'LOCOMM' LOCOMM=EDouble ')')?
+	('(' 'LDA' LDA=EDouble ')')?
+	('(' 'MAXNESTING' MAXNESTING=EDouble ')')?
+	('(' 'NOAV' NOAV=EDouble ')')?
+	('(' 'NOOC' NOOC=EDouble ')')?
+	('(' 'NOPAR' NOPAR=EDouble ')')?
+	('(' 'OCDO' OCDO=EDouble ')')?
+	('(' 'OCIO' OCIO=EDouble ')')?
 		
-		('Invocation_OF_sender' '(' Invocation_OF_sender+=[FAMIX::Invocation|EString] ( "," Invocation_OF_sender+=[FAMIX::Invocation|EString])* ')' )?
-		('LocalVariable_OF_parentBehaviouralEntity' '(' LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EString] ( "," LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EString])* ')' )?
-		('Access_OF_accessor' '(' Access_OF_accessor+=[FAMIX::Access|EString] ( "," Access_OF_accessor+=[FAMIX::Access|EString])* ')' )?
-		('Parameter_OF_parentBehaviouralEntity' '(' Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EString] ( "," Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EString])* ')' )?
-		('Invocation_OF_candidates' '(' Invocation_OF_candidates+=[FAMIX::Invocation|EString] ( "," Invocation_OF_candidates+=[FAMIX::Invocation|EString])* ')' )?
+		//derived
+		('Invocation_OF_sender' '(' Invocation_OF_sender+=[FAMIX::Invocation|EID] ( "," Invocation_OF_sender+=[FAMIX::Invocation|EID])* ')' )?
+		('LocalVariable_OF_parentBehaviouralEntity' '(' LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EID])* ')' )?
+		('Access_OF_accessor' '(' Access_OF_accessor+=[FAMIX::Access|EID] ( "," Access_OF_accessor+=[FAMIX::Access|EID])* ')' )?
+		('Parameter_OF_parentBehaviouralEntity' '(' Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID] ( "," Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID])* ')' )?
+		('Invocation_OF_candidates' '(' Invocation_OF_candidates+=[FAMIX::Invocation|EID] ( "," Invocation_OF_candidates+=[FAMIX::Invocation|EID])* ')' )?
 	')';
 
 Attribute returns FAMIX::Attribute:
 	{FAMIX::Attribute}
-	(hasClassScope?='hasClassScope')?
-	(isPrivate?='isPrivate')?
-	(isProtected?='isProtected')?
-	(isPublic?='isPublic')?
-	'Attribute'
-	id=EInt
-	'{'
-		('revisionId' revisionId=EBigInteger)?
-		('name' name=EString)?
-		('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EString] ( "," Access_OF_receiver+=[FAMIX::Access|EString])* ')' )?
-		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EString] ( "," Access_OF_variable+=[FAMIX::Access|EString])* ')' )?
-		('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EString] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EString])* ')' )?
-		('parentType_IN_Class' '(' parentType_IN_Class+=[FAMIX::Class|EString] ( "," parentType_IN_Class+=[FAMIX::Class|EString])* ')' )?
-		('declaredType_IN_Class' '(' declaredType_IN_Class+=[FAMIX::Class|EString] ( "," declaredType_IN_Class+=[FAMIX::Class|EString])* ')' )?
-		('declaredType_IN_PrimitiveType' '(' declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EString] ( "," declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EString])* ')' )?
-		('declaredType_IN_TypeAlias' '(' declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EString] ( "," declaredType_IN_TypeAlias+=[FAMIX::TypeAlias|EString])* ')' )?
-	'}';
+    '('
+    'FAMIX.Attribute'
+    '(' 'id:' id=EInt ')'
+	('(' 'name' name=EString ')')?
+	('(' 'parentType' '(' 'ref:' parentType_IN_Class+=[FAMIX::Class|EID] ')' ')')?
+	('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID] ')' ')')?
+	('(' 'hasClassScope' hasClassScope?=EBoolean ')')?
+	('(' 'isPublic' isPublic?=EBoolean ')')?
+	('(' 'isPrivate' isPrivate?=EBoolean ')')?
+	('(' 'isProtected' isProtected?=EBoolean ')')?
+	('(' 'isFinal' isFinal?=EBoolean ')')?
+		
+		//derived
+		('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EID] ( "," Access_OF_receiver+=[FAMIX::Access|EID])* ')' )?
+		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
+		('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EID] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EID])* ')' )?
+	')';
 
 Function returns FAMIX::Function:
 	{FAMIX::Function}
-	(isPublic?='isPublic')?
-	'Function'
-	id=EInt
-	'{'
-		('revisionId' revisionId=EBigInteger)?
-		('ALD' ALD=EDouble)?
-		('ATFD' ATFD=EDouble)?
-		('CYCLO' CYCLO=EDouble)?
-		('DR' DR=EDouble)?
-		('ICDO' ICDO=EDouble)?
-		('ICIO' ICIO=EDouble)?
-		('LDA' LDA=EDouble)?
-		('LOC' LOC=EDouble)?
-		('LOCOMM' LOCOMM=EDouble)?
-		('MAXNESTING' MAXNESTING=EDouble)?
-		('NOAV' NOAV=EDouble)?
-		('NOOC' NOOC=EDouble)?
-		('NOPAR' NOPAR=EDouble)?
-		('OCDO' OCDO=EDouble)?
-		('OCIO' OCIO=EDouble)?
-		('OCIO_POLY' OCIO_POLY=EString)?
-		('name' name=EString)?
-		('parentScope' '('parentScope_IN_Namespace+=[FAMIX::Namespace|EString] ( "," parentScope_IN_Namespace+=[FAMIX::Namespace|EString])* ')' )?
-		('signature' signature=EString)?
-		('declaredType_IN_Class' '(' declaredType_IN_Class+=[FAMIX::Class|EString] ( "," declaredType_IN_Class+=[FAMIX::Class|EString])* ')' )?
-		('sourceAnchor_IN_FileAnchor' '(' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EString] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EString])* ')' )?
-		('Invocation_OF_sender' '(' Invocation_OF_sender+=[FAMIX::Invocation|EString] ( "," Invocation_OF_sender+=[FAMIX::Invocation|EString])* ')' )?
-		('LocalVariable_OF_parentBehaviouralEntity' '(' LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EString] ( "," LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EString])* ')' )?
-		('Access_OF_accessor' '(' Access_OF_accessor+=[FAMIX::Access|EString] ( "," Access_OF_accessor+=[FAMIX::Access|EString])* ')' )?
-		('Parameter_OF_parentBehaviouralEntity' '(' Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EString] ( "," Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EString])* ')' )?
-		('Invocation_OF_candidates' '(' Invocation_OF_candidates+=[FAMIX::Invocation|EString] ( "," Invocation_OF_candidates+=[FAMIX::Invocation|EString])* ')' )?
-		('parentModule_IN_Module' '(' parentModule_IN_Module+=[FAMIX::Module|EString] ( "," parentModule_IN_Module+=[FAMIX::Module|EString])* ')' )?
-		('declaredType_IN_PrimitiveType' '(' declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EString] ( "," declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EString])* ')' )?
-	'}';
+	'('
+    'FAMIX.Function'
+    '(' 'id:' id=EInt ')'
+	('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ')' ')')
+	('(' 'name' name=EString ')')?
+	('(' 'signature' signature=EString ')')?
+	('(' 'sourceAnchor' '(' 'ref:' signatureSourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ')' ')')?
+	('(' 'parentModule' '(' 'ref:' parentModule_IN_Module+=[FAMIX::Module|EID] ')' ')')?
+	('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID]  ')' ')')?
+	('(' 'parentScope' '(' 'ref:' parentScope_IN_Namespace+=[FAMIX::Namespace|EID] ')' ')')?
+	('(' 'isPublic' isPublic?=EBoolean ')')?
+
+	('(' 'ATFD' ATFD=EDouble ')')?
+	('(' 'ALD' ALD=EDouble ')')?
+	('(' 'CYCLO' CYCLO=EDouble ')')?
+	('(' 'DR' DR=EDouble ')')?
+	('(' 'ICDO' ICDO=EDouble ')')?
+	('(' 'ICIO' ICIO=EDouble ')')?
+	('(' 'LOC' LOC=EDouble ')')?
+	('(' 'LOCOMM' LOCOMM=EDouble ')')?
+	('(' 'LDA' LDA=EDouble ')')?
+	('(' 'MAXNESTING' MAXNESTING=EDouble ')')?
+	('(' 'NOAV' NOAV=EDouble ')')?
+	('(' 'NOOC' NOOC=EDouble ')')?
+	('(' 'NOPAR' NOPAR=EDouble ')')?
+	('(' 'OCDO' OCDO=EDouble ')')?
+	('(' 'OCIO' OCIO=EDouble ')')?
+	('(' 'OCIO_POLY' OCIO_POLY=EDouble ')')?
+		
+        //derived
+		('Invocation_OF_sender' '(' Invocation_OF_sender+=[FAMIX::Invocation|EID] ( "," Invocation_OF_sender+=[FAMIX::Invocation|EID])* ')' )?
+		('LocalVariable_OF_parentBehaviouralEntity' '(' LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_parentBehaviouralEntity+=[FAMIX::LocalVariable|EID])* ')' )?
+		('Access_OF_accessor' '(' Access_OF_accessor+=[FAMIX::Access|EID] ( "," Access_OF_accessor+=[FAMIX::Access|EID])* ')' )?
+		('Parameter_OF_parentBehaviouralEntity' '(' Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID] ( "," Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID])* ')' )?
+		('Invocation_OF_candidates' '(' Invocation_OF_candidates+=[FAMIX::Invocation|EID] ( "," Invocation_OF_candidates+=[FAMIX::Invocation|EID])* ')' )?
+	')';
 
 EBoolean returns ecore::EBoolean:
 	'true' | 'false';
 
 Invocation returns FAMIX::Invocation:
 	{FAMIX::Invocation}
-	'Invocation'
-	'{'
-		('revisionId' revisionId=EBigInteger)?
-		('signature' signature=EString)?
-		('receiver_IN_Attribute' '(' receiver_IN_Attribute+=[FAMIX::Attribute|EString] ( "," receiver_IN_Attribute+=[FAMIX::Attribute|EString])* ')' )?
-		('sender_IN_Function' '(' sender_IN_Function+=[FAMIX::Function|EString] ( "," sender_IN_Function+=[FAMIX::Function|EString])* ')' )?
-		('candidates_IN_Function' '(' candidates_IN_Function+=[FAMIX::Function|EString] ( "," candidates_IN_Function+=[FAMIX::Function|EString])* ')' )?
-		('receiver_IN_LocalVariable' '(' receiver_IN_LocalVariable+=[FAMIX::LocalVariable|EString] ( "," receiver_IN_LocalVariable+=[FAMIX::LocalVariable|EString])* ')' )?
-		('sender_IN_Method' '(' sender_IN_Method+=[FAMIX::Method|EString] ( "," sender_IN_Method+=[FAMIX::Method|EString])* ')' )?
-		('candidates_IN_Method' '(' candidates_IN_Method+=[FAMIX::Method|EString] ( "," candidates_IN_Method+=[FAMIX::Method|EString])* ')' )?
-		('receiver_IN_Parameter' '(' receiver_IN_Parameter+=[FAMIX::Parameter|EString] ( "," receiver_IN_Parameter+=[FAMIX::Parameter|EString])* ')' )?
-	'}';
+	'('
+    'FAMIX.Invocation'
+    //'(' 'id:' id=EInt ')'
+	('(' 'sender' '(' 'ref:' sender+=[FAMIX::AbstractInvocationReceiver|EID]  ')' ')')?
+	('(' 'candidates' '(' 'ref:' candidates+=[FAMIX::AbstractInvocationReceiver|EID]  ')' ')')?
+	('(' 'receiver' '(' 'ref:' receiver+=[FAMIX::AbstractInvocationReceiver|EID]  ')' ')')?
+	('(' 'signature' signature=EString ')')?
+	
+	//derived? no id!
+	')';
 
 Access returns FAMIX::Access:
 	{FAMIX::Access}
-	(isWrite?='isWrite')?
-	'Access'
-	'{'
-		('revisionId' revisionId=EBigInteger)?
-		('receiver_IN_Attribute' '(' receiver_IN_Attribute+=[FAMIX::Attribute|EString] ( "," receiver_IN_Attribute+=[FAMIX::Attribute|EString])* ')' )?
-		('variable_IN_Attribute' '(' variable_IN_Attribute+=[FAMIX::Attribute|EString] ( "," variable_IN_Attribute+=[FAMIX::Attribute|EString])* ')' )?
-		('accessor_IN_Function' '(' accessor_IN_Function+=[FAMIX::Function|EString] ( "," accessor_IN_Function+=[FAMIX::Function|EString])* ')' )?
-		('variable_IN_GlobalVariable' '(' variable_IN_GlobalVariable+=[FAMIX::GlobalVariable|EString] ( "," variable_IN_GlobalVariable+=[FAMIX::GlobalVariable|EString])* ')' )?
-		('receiver_IN_LocalVariable' '(' receiver_IN_LocalVariable+=[FAMIX::LocalVariable|EString] ( "," receiver_IN_LocalVariable+=[FAMIX::LocalVariable|EString])* ')' )?
-		('variable_IN_LocalVariable' '(' variable_IN_LocalVariable+=[FAMIX::LocalVariable|EString] ( "," variable_IN_LocalVariable+=[FAMIX::LocalVariable|EString])* ')' )?
-		('accessor_IN_Method' '(' accessor_IN_Method+=[FAMIX::Method|EString] ( "," accessor_IN_Method+=[FAMIX::Method|EString])* ')' )?
-		('receiver_IN_Parameter' '(' receiver_IN_Parameter+=[FAMIX::Parameter|EString] ( "," receiver_IN_Parameter+=[FAMIX::Parameter|EString])* ')' )?
-		('variable_IN_Parameter' '(' variable_IN_Parameter+=[FAMIX::Parameter|EString] ( "," variable_IN_Parameter+=[FAMIX::Parameter|EString])* ')' )?
-	'}';
+    '('
+    'FAMIX.Access'
+	('(' 'variable' '(' 'ref:' variable+=[FAMIX::AbstractVariableReceiver|EID] ')' ')')?
+	('(' 'accessor' '(' 'ref:' accessor+=[FAMIX::AbstractBehaviouralEntity|EID]  ')' ')')?
+	('(' 'receiver' '(' 'ref:' receiver+=[FAMIX::AbstractVariableReceiver|EID]  ')' ')')?
+	('(' 'isWrite' isWrite?=EBoolean ')')?
+
+    //derived? no id!
+	')';
 
 PrimitiveType returns FAMIX::PrimitiveType:
 	{FAMIX::PrimitiveType}
@@ -369,34 +469,60 @@ PrimitiveType returns FAMIX::PrimitiveType:
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     
-		('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EString] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EString])* ')' )?
-		('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EString] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EString])* ')' )?
-		('Function_OF_declaredType' '(' Function_OF_declaredType+=[FAMIX::Function|EString] ( "," Function_OF_declaredType+=[FAMIX::Function|EString])* ')' )?
-		('Method_OF_declaredType' '(' Method_OF_declaredType+=[FAMIX::Method|EString] ( "," Method_OF_declaredType+=[FAMIX::Method|EString])* ')' )?
-		('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EString] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EString])* ')' )?
-		('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EString] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EString])* ')' )?
+        //derived
+		('Parameter_OF_declaredType' '(' Parameter_OF_declaredType+=[FAMIX::Parameter|EID] ( "," Parameter_OF_declaredType+=[FAMIX::Parameter|EID])* ')' )?
+		('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID])* ')' )?
+		('Function_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Function|EID]  ')' )?
+		('Method_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Method|EID]  ')' )?
+		('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EID])* ')' )?
+		('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID])* ')' )?
 	')';
 
 GlobalVariable returns FAMIX::GlobalVariable:
 	{FAMIX::GlobalVariable}
-	'GlobalVariable'
-	id=EInt
-	'{'
-		('revisionId' revisionId=EBigInteger)?
-		('container' '('container_IN_Namespace+=[FAMIX::Namespace|EString] ( "," container_IN_Namespace+=[FAMIX::Namespace|EString])* ')' )?
-		('name' name=EString)?
-		('declaredType_IN_Class' '(' declaredType_IN_Class+=[FAMIX::Class|EString] ( "," declaredType_IN_Class+=[FAMIX::Class|EString])* ')' )?
-		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EString] ( "," Access_OF_variable+=[FAMIX::Access|EString])* ')' )?
-		('parentModule_IN_Module' '(' parentModule_IN_Module+=[FAMIX::Module|EString] ( "," parentModule_IN_Module+=[FAMIX::Module|EString])* ')' )?
-		('declaredType_IN_PrimitiveType' '(' declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EString] ( "," declaredType_IN_PrimitiveType+=[FAMIX::PrimitiveType|EString])* ')' )?
-	'}';
+    '('
+    'FAMIX.GlobalVariable'
+    '(' 'id:' id=EInt ')'
+    ('(' 'name' name=EString ')')?
+	('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID] ')' ')')?
+	('(' 'parentModule' '(' 'ref:' parentModule_IN_Module+=[FAMIX::Module|EID]  ')' ')')?
+	('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ')' ')')?
+
+        //derived
+		('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
+	')';
+
+Enum returns FAMIX::Enum:
+    {FAMIX::Enum}
+    '('
+    'FAMIX.Enum'
+    '(' 'id:' id=EInt ')'
+    ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ')' ')')?
+    ('(' 'name' name=EString ')')?
+
+        //derived
+        ('EnumValue_OF_parentEnum' '(' EnumValue_OF_parentEnum+=[FAMIX::EnumValue|EID] ( "," EnumValue_OF_parentEnum+=[FAMIX::EnumValue|EID])* ')' )?
+    ')';
+
+EnumValue returns FAMIX::EnumValue:
+    {FAMIX::EnumValue}
+    '('
+    'FAMIX.EnumValue'
+    '(' 'id:' id=EInt ')'
+    ('(' 'name' name=EString ')')?
+    ('(' 'parentEnum' '(' 'ref:' parentEnum_IN_Enum+=[FAMIX::Enum|EID] ')' ')')?
+
+        //derived
+    ')';
+
 
 Inheritance returns FAMIX::Inheritance:
 	{FAMIX::Inheritance}
-	'Inheritance'
-	'{'
-		('revisionId' revisionId=EBigInteger)?
-		('id' id=EInt)?
-		('subclass_IN_Class' '(' subclass_IN_Class+=[FAMIX::Class|EString] ( "," subclass_IN_Class+=[FAMIX::Class|EString])* ')' )?
-		('superclass_IN_Class' '(' superclass_IN_Class+=[FAMIX::Class|EString] ( "," superclass_IN_Class+=[FAMIX::Class|EString])* ')' )?
-	'}';
+    '('
+    'FAMIX.Inheritance'
+    '(' 'id:' id=EInt ')'
+	('(' 'subclass' '(' 'ref:' subclass_IN_Class+=[FAMIX::Class|EID]  ')' ')')?
+	('(' 'superclass' '(' 'ref:' superclass_IN_Class+=[FAMIX::Class|EID]  ')' ')')?
+
+	//derived?
+	')';
