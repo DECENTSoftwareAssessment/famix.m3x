@@ -5,7 +5,7 @@ import org.eclipse.xtext.generator.*
 import org.eclipse.xtext.ui.generator.*
 
 var grammarURI = "classpath:/famix/M3x.xtext"
-var fileExtensions = "m3x"
+var fileExtensions = "m3x,mse"
 var projectName = "famix.m3x"
 var runtimeProject = "../${projectName}"
 var generateXtendStub = true
