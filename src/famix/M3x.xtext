@@ -34,12 +34,31 @@ AbstractElement:
     | ParameterType
     | ParameterizedType
     | Enum
-    | EnumValue;
+    | EnumValue
+    | Water;
 
 LanguageSpec returns FAMIX::CSourceLanguage:
     {FAMIX::CSourceLanguage}
     '('
     'FAMIX.CSourceLanguage'
+    ')'
+;
+
+WaterName returns ecore::EString:
+    ('FAMIX.')?
+    ('sourceAnchor' | 'container' | 'parentPackage' | 'isStub' | 'id:' | 'ref:' | ID)
+;
+
+WaterContent returns ecore::EString:
+    (EString | INT+ ('.' INT+)? | 'true' | 'false' )
+;
+
+Water returns Water:
+	{Water}
+    '('
+    name=WaterName
+    (content=WaterContent)?
+    (water+=Water)*
     ')'
 ;
 
@@ -59,6 +78,7 @@ Package returns FAMIX::Package:
         ('Module_OF_parentPackage' '(' Module_OF_parentPackage+=[FAMIX::Module|EID] ( "," Module_OF_parentPackage+=[FAMIX::Module|EID])* ')' )?
         ('TypeAlias_OF_parentPackage' '(' TypeAlias_OF_parentPackage+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_parentPackage+=[FAMIX::TypeAlias|EID])* ')' )?
         ('Class_OF_parentPackage' '(' Class_OF_parentPackage+=[FAMIX::Class|EID] ( "," Class_OF_parentPackage+=[FAMIX::Class|EID])* ')' )?
+    ( water+=Water )*
     ')';
 
 Namespace returns FAMIX::Namespace:
@@ -349,10 +369,10 @@ Method returns FAMIX::Method:
     ('(' 'isProtected' isProtected?=EBoolean ')')?
     ('(' 'isPrivate' isPrivate?=EBoolean ')')?
     ('(' 'isVirtual' isVirtual?=EBoolean ')')?
+    ('(' 'isConstructor' isConstructor?=EBoolean ')')?
     ('(' 'isPureAccessor' isPureAccessor?=EBoolean ')')?
     ('(' 'isAbstract' isAbstract?=EBoolean ')')?
     ('(' 'isPackage' isPackage?=EBoolean ')')?
-    ('(' 'isConstructor' isConstructor?=EBoolean ')')?
     
     ('(' 'ATFD' ATFD=EDouble ')')?
     ('(' 'ALD' ALD=EDouble ')')?
