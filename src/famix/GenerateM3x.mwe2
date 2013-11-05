@@ -16,7 +16,7 @@ Workflow {
 		platformUri = "${runtimeProject}/.."
 		registerGeneratedEPackage = "AbstractDECENTProvider.AbstractDECENTProviderPackage"
 		registerGeneratedEPackage = "FAMIX.FAMIXPackage"
-		registerGenModelFile = "platform:/resource/famix.m3/model/FAMIX.genmodel"
+		registerGenModelFile = "platform:/resource/DECENT.Meta/model/FAMIX.genmodel"
 	}
 
 	component = DirectoryCleaner {
