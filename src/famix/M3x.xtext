@@ -368,11 +368,11 @@ Method returns FAMIX::Method:
     ('(' 'isPublic' isPublic?=EBoolean ')')?
     ('(' 'isProtected' isProtected?=EBoolean ')')?
     ('(' 'isPrivate' isPrivate?=EBoolean ')')?
+    ('(' 'isPackage' isPackage?=EBoolean ')')?
     ('(' 'isVirtual' isVirtual?=EBoolean ')')?
     ('(' 'isConstructor' isConstructor?=EBoolean ')')?
     ('(' 'isPureAccessor' isPureAccessor?=EBoolean ')')?
     ('(' 'isAbstract' isAbstract?=EBoolean ')')?
-    ('(' 'isPackage' isPackage?=EBoolean ')')?
     
     ('(' 'ATFD' ATFD=EDouble ')')?
     ('(' 'ALD' ALD=EDouble ')')?

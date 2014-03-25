@@ -3,6 +3,10 @@
 */
 package famix;
 
+import FAMIX.impl.FAMIXPackageImpl;
+
+import com.google.inject.Injector;
+
 /**
  * Initialization support for running Xtext languages 
  * without equinox extension registry
@@ -11,6 +15,16 @@ public class M3xStandaloneSetup extends M3xStandaloneSetupGenerated{
 
 	public static void doSetup() {
 		new M3xStandaloneSetup().createInjectorAndDoEMFRegistration();
+	}
+	
+	@Override
+	public Injector createInjectorAndDoEMFRegistration() {
+		FAMIXPackageImpl.init(); 
+		org.eclipse.xtext.common.TerminalsStandaloneSetup.doSetup();
+
+		Injector injector = createInjector();
+		register(injector);
+		return injector;
 	}
 }
 
