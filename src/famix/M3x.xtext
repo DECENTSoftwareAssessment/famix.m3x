@@ -11,6 +11,49 @@ Model returns Model:
     (elements+=AbstractElement)*
     ')'
 ;
+//TODO: replace all other FAMIX keywords
+terminal FAMIX_TypeAlias : 
+			'FAMIX.TypeAlias';
+terminal FAMIX_Access : 
+			'FAMIX.Access';
+terminal FAMIX_Method : 
+			'FAMIX.Method';
+terminal FAMIX_Attribute : 
+			'FAMIX.Attribute';
+terminal FAMIX_Enum : 
+			'FAMIX.Enum';
+terminal FAMIX_EnumValue : 
+			'FAMIX.EnumValue';
+terminal FAMIX_FileAnchor : 
+			'FAMIX.FileAnchor';
+terminal FAMIX_Function : 
+			'FAMIX.Function';
+terminal FAMIX_GlobalVariable : 
+			'FAMIX.GlobalVariable';
+terminal FAMIX_Inheritance : 
+			'FAMIX.Inheritance';
+terminal FAMIX_Class : 
+			'FAMIX.Class';
+terminal FAMIX_CSourceLanguage : 
+			'FAMIX.CSourceLanguage';
+terminal FAMIX_Module : 
+			'FAMIX.Module';
+terminal FAMIX_ParameterizableClass : 
+			'FAMIX.ParameterizableClass';
+terminal FAMIX_ParameterType : 
+			'FAMIX.ParameterType';
+terminal FAMIX_Parameter : 
+			'FAMIX.Parameter';
+terminal FAMIX_LocalVariable : 
+			'FAMIX.LocalVariable';
+terminal FAMIX_ParameterizedType : 
+			'FAMIX.ParameterizedType';
+terminal FAMIX_PrimitiveType : 
+			'FAMIX.PrimitiveType';
+terminal FAMIX_Invocation : 
+			'FAMIX.Invocation';
+terminal FAMIX_Water : 
+			'FAMIX.' ID;
 
 AbstractElement:
     Class
@@ -40,13 +83,12 @@ AbstractElement:
 LanguageSpec returns FAMIX::CSourceLanguage:
     {FAMIX::CSourceLanguage}
     '('
-    'FAMIX.CSourceLanguage'
+    FAMIX_CSourceLanguage
     ')'
 ;
 
 WaterName returns ecore::EString:
-    ('FAMIX.')?
-    ('sourceAnchor' | 'container' | 'parentPackage' | 'isStub' | 'id:' | 'ref:' | ID)
+    (FAMIX_Water | 'sourceAnchor' | 'container' | 'parentPackage' | 'isStub' | 'id:' | 'ref:' | ID)
 ;
 
 WaterContent returns ecore::EString:
@@ -95,6 +137,7 @@ Namespace returns FAMIX::Namespace:
         ('GlobalVariable_OF_container' GlobalVariable_OF_container+=[FAMIX::GlobalVariable|EID] ("," GlobalVariable_OF_container+=[FAMIX::GlobalVariable|EID])* ')' )?
         ('Class_OF_container' '(' Class_OF_container+=[FAMIX::Class|EID] (',' Class_OF_container+=[FAMIX::Class|EID])* ')' )?
         ('Enum_OF_container' '(' Enum_OF_container+=[FAMIX::Enum|EID] (',' Enum_OF_container+=[FAMIX::Enum|EID])* ')' )?
+    ( water+=Water )*
     ')';
 
 
@@ -111,7 +154,7 @@ EString returns ecore::EString:
 TypeAlias returns FAMIX::TypeAlias:
     {FAMIX::TypeAlias}
     '('
-    'FAMIX.TypeAlias'
+    FAMIX_TypeAlias
     '(' 'id:' id=EInt ')' 
 //    ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
     ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor=[FAMIX::FileAnchor|EID] ')' ')')?
@@ -149,12 +192,13 @@ TypeAlias returns FAMIX::TypeAlias:
         ('LocalVariable_OF_declaredType' '(' LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID] ( "," LocalVariable_OF_declaredType+=[FAMIX::LocalVariable|EID])* ')' )?
         ('Method_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Method|EID]  ')' )?
         ('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EID])* ')' )?
+
     ')';
 
 Class returns FAMIX::Class:
     {FAMIX::Class}
     '('
-    'FAMIX.Class'
+    FAMIX_Class
     '(' 'id:' id=EInt ')'
 //    ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
     ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor=[FAMIX::FileAnchor|EID] ')' ')')?
@@ -163,6 +207,7 @@ Class returns FAMIX::Class:
     ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ( "," container_IN_Namespace+=[FAMIX::Namespace|EID])* ')' ')')?
     ('(' 'name' name=EString ')')?
     ('(' 'isAbstract' isAbstract=EBoolean ')')?
+    ('(' 'isFinal' isFinal?=EBoolean ')')?
     ('(' 'AMW' AMW=EDouble ')')?
     ('(' 'BOvR' BOvR=EDouble ')')?
     ('(' 'BUR' BUR=EDouble ')')?
@@ -207,7 +252,7 @@ Class returns FAMIX::Class:
 ParameterizableClass returns FAMIX::ParameterizableClass:
     {FAMIX::ParameterizableClass}
     '('
-    'FAMIX.ParameterizableClass'
+    FAMIX_ParameterizableClass
     '(' 'id:' id=EInt ')'
 //    ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
     ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor=[FAMIX::FileAnchor|EID] ')' ')')?
@@ -254,13 +299,14 @@ ParameterizableClass returns FAMIX::ParameterizableClass:
         ('Inheritance_OF_subclass' '(' Inheritance_OF_subclass+=[FAMIX::Inheritance|EID] ( "," Inheritance_OF_subclass+=[FAMIX::Inheritance|EID])* ')' )?
         ('Inheritance_OF_superclass' '(' Inheritance_OF_superclass+=[FAMIX::Inheritance|EID] ( "," Inheritance_OF_superclass+=[FAMIX::Inheritance|EID])* ')' )?
         ('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID])* ')' )?
+
     ')'
     ;
 
 Module returns FAMIX::Module:
     {FAMIX::Module}
     '('
-    'FAMIX.Module'
+    FAMIX_Module
     '(' 'id:' id=EInt ')'
     ('(' 'parentPackage' '(' 'ref:' parentPackage_IN_Package+=[FAMIX::Package|EID] ( "," parentPackage_IN_Package+=[FAMIX::Package|EID])* ')' ')')?
     ('(' 'name' name=EString ')')?
@@ -274,6 +320,7 @@ Module returns FAMIX::Module:
        //derived
         ('Function_OF_parentModule' '(' Function_OF_parentModule+=[FAMIX::Function|EID] ( "," Function_OF_parentModule+=[FAMIX::Function|EID])* ')' )?
         ('GlobalVariable_OF_parentModule' '(' GlobalVariable_OF_parentModule+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_parentModule+=[FAMIX::GlobalVariable|EID])* ')' )?
+
     ')';
 
 EDouble returns ecore::EDouble:
@@ -282,7 +329,7 @@ EDouble returns ecore::EDouble:
 FileAnchor returns FAMIX::FileAnchor:
     {FAMIX::FileAnchor}
     '('
-    'FAMIX.FileAnchor'
+    FAMIX_FileAnchor
     '(' 'id:' id=EInt ')'
     ('(' 'fileName' fileName=EString ')')?
     ('(' 'startLine' startLine=EInt ')')?
@@ -295,12 +342,13 @@ FileAnchor returns FAMIX::FileAnchor:
 //      ('TypeAlias_OF_sourceAnchor' '(' TypeAlias_OF_sourceAnchor+=[FAMIX::TypeAlias|EID] ( "," TypeAlias_OF_sourceAnchor+=[FAMIX::TypeAlias|EID])* ')' )?
 //      ('Class_OF_sourceAnchor' '(' Class_OF_sourceAnchor+=[FAMIX::Class|EID] ( "," Class_OF_sourceAnchor+=[FAMIX::Class|EID])* ')' )?
 //      ('Method_OF_sourceAnchor' '(' BehaviouralEntity_OF_sourceAnchor+=[FAMIX::Method|EID]  ')' )?
+
     ')';
 
 Parameter returns FAMIX::Parameter:
     {FAMIX::Parameter}
     '('
-    'FAMIX.Parameter'
+    FAMIX_Parameter
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'parentBehaviouralEntity' '(' 'ref:' parentBehaviouralEntity+=[FAMIX::AbstractBehaviouralEntity|EID] ')' ')')?
@@ -311,36 +359,39 @@ Parameter returns FAMIX::Parameter:
         ('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EID] ( "," Access_OF_receiver+=[FAMIX::Access|EID])* ')' )?
         ('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
         ('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EID] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EID])* ')' )?
+
     ')';
 
 ParameterType returns FAMIX::ParameterType:
     {FAMIX::ParameterType}
     '('
-    'FAMIX.ParameterType'
+    FAMIX_ParameterType
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'container' '(' 'ref:' ( container_IN_Namespace+=[FAMIX::Namespace|EID] ) ')' ')')?
 
         //derived
+
     ')';
 
 ParameterizedType returns FAMIX::ParameterizedType:
     {FAMIX::ParameterizedType}
     '('
-    'FAMIX.ParameterizedType'
+    FAMIX_ParameterizedType
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'parameterizableClass' '(' 'ref:' ( parameterizableClass+=[FAMIX::ParameterizableClass|EID] ) ')' ')')?
     ('(' 'arguments' '(' 'ref:' ( arguments+=[FAMIX::AbstractDeclaredType|EID] ) ')' ')')?
 
         //derived
+
     ')';
 
 
 LocalVariable returns FAMIX::LocalVariable:
     {FAMIX::LocalVariable}
     '('
-    'FAMIX.LocalVariable'
+    FAMIX_LocalVariable
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID] ')' ')')?
@@ -350,12 +401,13 @@ LocalVariable returns FAMIX::LocalVariable:
         ('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EID] ( "," Access_OF_receiver+=[FAMIX::Access|EID])* ')' )?
         ('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
         ('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EID] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EID])* ')' )?
+
     ')';
 
 Method returns FAMIX::Method:
     {FAMIX::Method}
     '('
-    'FAMIX.Method'
+    FAMIX_Method
     '(' 'id:' id=EInt ')'
         
 //  ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID] ( "," sourceAnchor_IN_FileAnchor+=[FAMIX::FileAnchor|EID])* ')' ')')?
@@ -369,6 +421,7 @@ Method returns FAMIX::Method:
     ('(' 'isProtected' isProtected?=EBoolean ')')?
     ('(' 'isPrivate' isPrivate?=EBoolean ')')?
     ('(' 'isPackage' isPackage?=EBoolean ')')?
+    ('(' 'isFinal' isFinal?=EBoolean ')')?
     ('(' 'isVirtual' isVirtual?=EBoolean ')')?
     ('(' 'isConstructor' isConstructor?=EBoolean ')')?
     ('(' 'isPureAccessor' isPureAccessor?=EBoolean ')')?
@@ -396,12 +449,13 @@ Method returns FAMIX::Method:
         ('Access_OF_accessor' '(' Access_OF_accessor+=[FAMIX::Access|EID] ( "," Access_OF_accessor+=[FAMIX::Access|EID])* ')' )?
         ('Parameter_OF_parentBehaviouralEntity' '(' Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID] ( "," Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID])* ')' )?
         ('Invocation_OF_candidates' '(' Invocation_OF_candidates+=[FAMIX::Invocation|EID] ( "," Invocation_OF_candidates+=[FAMIX::Invocation|EID])* ')' )?
+
     ')';
 
 Attribute returns FAMIX::Attribute:
     {FAMIX::Attribute}
     '('
-    'FAMIX.Attribute'
+    FAMIX_Attribute
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'parentType' '(' 'ref:' parentType_IN_Class+=[FAMIX::Class|EID] ')' ')')?
@@ -416,12 +470,13 @@ Attribute returns FAMIX::Attribute:
         ('Access_OF_receiver' '(' Access_OF_receiver+=[FAMIX::Access|EID] ( "," Access_OF_receiver+=[FAMIX::Access|EID])* ')' )?
         ('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
         ('Invocation_OF_receiver' '(' Invocation_OF_receiver+=[FAMIX::Invocation|EID] ( "," Invocation_OF_receiver+=[FAMIX::Invocation|EID])* ')' )?
+
     ')';
 
 Function returns FAMIX::Function:
     {FAMIX::Function}
     '('
-    'FAMIX.Function'
+    FAMIX_Function
     '(' 'id:' id=EInt ')'
     ('(' 'sourceAnchor' '(' 'ref:' sourceAnchor_IN_FileAnchor=[FAMIX::FileAnchor|EID] ')' ')')
     ('(' 'name' name=EString ')')?
@@ -455,6 +510,7 @@ Function returns FAMIX::Function:
         ('Access_OF_accessor' '(' Access_OF_accessor+=[FAMIX::Access|EID] ( "," Access_OF_accessor+=[FAMIX::Access|EID])* ')' )?
         ('Parameter_OF_parentBehaviouralEntity' '(' Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID] ( "," Parameter_OF_parentBehaviouralEntity+=[FAMIX::Parameter|EID])* ')' )?
         ('Invocation_OF_candidates' '(' Invocation_OF_candidates+=[FAMIX::Invocation|EID] ( "," Invocation_OF_candidates+=[FAMIX::Invocation|EID])* ')' )?
+
     ')';
 
 EBoolean returns ecore::EBoolean:
@@ -463,7 +519,7 @@ EBoolean returns ecore::EBoolean:
 Invocation returns FAMIX::Invocation:
     {FAMIX::Invocation}
     '('
-    'FAMIX.Invocation'
+    FAMIX_Invocation
     //'(' 'id:' id=EInt ')'
     ('(' 'sender' '(' 'ref:' sender+=[FAMIX::AbstractInvocationReceiver|EID]  ')' ')')?
     ('(' 'candidates' '(' 'ref:' candidates+=[FAMIX::AbstractInvocationReceiver|EID]  ')' ')')?
@@ -471,24 +527,26 @@ Invocation returns FAMIX::Invocation:
     ('(' 'signature' signature=EString ')')?
     
     //derived? no id!
+
     ')';
 
 Access returns FAMIX::Access:
     {FAMIX::Access}
     '('
-    'FAMIX.Access'
+    FAMIX_Access
     ('(' 'variable' '(' 'ref:' variable+=[FAMIX::AbstractVariableReceiver|EID] ')' ')')?
     ('(' 'accessor' '(' 'ref:' accessor+=[FAMIX::AbstractBehaviouralEntity|EID]  ')' ')')?
     ('(' 'receiver' '(' 'ref:' receiver+=[FAMIX::AbstractVariableReceiver|EID]  ')' ')')?
     ('(' 'isWrite' isWrite?=EBoolean ')')?
 
     //derived? no id!
+
     ')';
 
 PrimitiveType returns FAMIX::PrimitiveType:
     {FAMIX::PrimitiveType}
     '('
-    'FAMIX.PrimitiveType'
+    FAMIX_PrimitiveType
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     
@@ -499,12 +557,13 @@ PrimitiveType returns FAMIX::PrimitiveType:
         ('Method_OF_declaredType' '(' BehaviouralEntity_OF_declaredType+=[FAMIX::Method|EID]  ')' )?
         ('Attribute_OF_declaredType' '(' Attribute_OF_declaredType+=[FAMIX::Attribute|EID] ( "," Attribute_OF_declaredType+=[FAMIX::Attribute|EID])* ')' )?
         ('GlobalVariable_OF_declaredType' '(' GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID] ( "," GlobalVariable_OF_declaredType+=[FAMIX::GlobalVariable|EID])* ')' )?
+
     ')';
 
 GlobalVariable returns FAMIX::GlobalVariable:
     {FAMIX::GlobalVariable}
     '('
-    'FAMIX.GlobalVariable'
+    FAMIX_GlobalVariable
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'declaredType' '(' 'ref:' declaredType+=[FAMIX::AbstractDeclaredType|EID] ')' ')')?
@@ -513,12 +572,13 @@ GlobalVariable returns FAMIX::GlobalVariable:
 
         //derived
         ('Access_OF_variable' '(' Access_OF_variable+=[FAMIX::Access|EID] ( "," Access_OF_variable+=[FAMIX::Access|EID])* ')' )?
+
     ')';
 
 Enum returns FAMIX::Enum:
     {FAMIX::Enum}
     '('
-    'FAMIX.Enum'
+    FAMIX_Enum
     '(' 'id:' id=EInt ')'
     ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ')' ')')?
     ('(' 'name' name=EString ')')?
@@ -530,7 +590,7 @@ Enum returns FAMIX::Enum:
 EnumValue returns FAMIX::EnumValue:
     {FAMIX::EnumValue}
     '('
-    'FAMIX.EnumValue'
+    FAMIX_EnumValue
     '(' 'id:' id=EInt ')'
     ('(' 'name' name=EString ')')?
     ('(' 'parentEnum' '(' 'ref:' parentEnum_IN_Enum+=[FAMIX::Enum|EID] ')' ')')?
@@ -542,10 +602,11 @@ EnumValue returns FAMIX::EnumValue:
 Inheritance returns FAMIX::Inheritance:
     {FAMIX::Inheritance}
     '('
-    'FAMIX.Inheritance'
+    FAMIX_Inheritance
     '(' 'id:' id=EInt ')'
     ('(' 'subclass' '(' 'ref:' subclass_IN_Class+=[FAMIX::Class|EID]  ')' ')')?
     ('(' 'superclass' '(' 'ref:' superclass_IN_Class+=[FAMIX::Class|EID]  ')' ')')?
 
     //derived?
+
     ')';
