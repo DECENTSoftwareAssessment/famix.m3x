@@ -423,9 +423,9 @@ Method returns FAMIX::Method:
     ('(' 'isPackage' isPackage?=EBoolean ')')?
     ('(' 'isFinal' isFinal?=EBoolean ')')?
     ('(' 'isVirtual' isVirtual?=EBoolean ')')?
+    ('(' 'isAbstract' isAbstract?=EBoolean ')')?
     ('(' 'isConstructor' isConstructor?=EBoolean ')')?
     ('(' 'isPureAccessor' isPureAccessor?=EBoolean ')')?
-    ('(' 'isAbstract' isAbstract?=EBoolean ')')?
     
     ('(' 'ATFD' ATFD=EDouble ')')?
     ('(' 'ALD' ALD=EDouble ')')?
