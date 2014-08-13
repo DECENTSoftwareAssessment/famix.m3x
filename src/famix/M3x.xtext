@@ -208,6 +208,7 @@ Class returns FAMIX::Class:
     ('(' 'name' name=EString ')')?
     ('(' 'isAbstract' isAbstract=EBoolean ')')?
     ('(' 'isFinal' isFinal?=EBoolean ')')?
+    ('(' 'isInterface' isInterface=EBoolean ')')?
     ('(' 'AMW' AMW=EDouble ')')?
     ('(' 'BOvR' BOvR=EDouble ')')?
     ('(' 'BUR' BUR=EDouble ')')?
