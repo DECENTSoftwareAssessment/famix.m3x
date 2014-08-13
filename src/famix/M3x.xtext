@@ -262,6 +262,8 @@ ParameterizableClass returns FAMIX::ParameterizableClass:
     ('(' 'container' '(' 'ref:' container_IN_Namespace+=[FAMIX::Namespace|EID] ( "," container_IN_Namespace+=[FAMIX::Namespace|EID])* ')' ')')?
     ('(' 'name' name=EString ')')?
     ('(' 'isAbstract' isAbstract=EBoolean ')')?
+    ('(' 'isInterface' isInterface=EBoolean ')')?
+    ('(' 'isFinal' isFinal?=EBoolean ')')?
     ('(' 'AMW' AMW=EDouble ')')?
     ('(' 'BOvR' BOvR=EDouble ')')?
     ('(' 'BUR' BUR=EDouble ')')?
